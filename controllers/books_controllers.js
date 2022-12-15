@@ -2,7 +2,7 @@ const express = require('express')
 const books = express.Router()
 const Book= require('../models/books.js')
 
-module.exports = books
+
 
 // Seed:
 books.get('/seed', (req, res) => {
@@ -46,16 +46,66 @@ books.get('/seed', (req, res) => {
 
 // Index:
 books.get('/', (req, res) => {
-    Books.find()
+    Book.find()
         .then(foundBooks => {
             res.json(foundBooks)
         })
+        .catch(err => {
+            res.status(400).json({
+                message: 'error'
+            })
+        })
 })
-
 // Show:
-books.get('/:name', (req, res) => {
-    Books.findOne({ name: req.params.name.toLowerCase() })
-        .then(foundBooks => {
-            res.json(foundBooks)
+books.get('/books:id', (req, res) => {
+    Book.findById(req.params.id)
+        .then(foundBook => {
+            res.json(foundBook)
+        })
+        .catch(err => {
+            res.status(400).json({
+                message: 'error'
+            })
         })
 })
+//Update:
+books.put('/:id', (req, res) => {
+    Book.findByIdAndUpdate(req.params.id, req.body)
+        .then(updatedBook => {
+            console.log(req.body)
+            res.status(200).json(updatedBook)
+        })
+        .catch(err => {
+            res.status(400).json({
+                message: 'error'
+            })
+        })
+})
+// Delete:
+books.delete('/:id', (req, res) => {
+    Book.findByIdAndDelete(req.params.id)
+        .then(deletedBook => {
+            res.status(200).json({
+                message: 'Delete successful'
+            })
+        })
+        .catch(err => {
+            res.status(400).json({
+                message: 'error'
+            })
+        })
+})
+// Create:
+books.post('/', (req, res) => {
+    Book.create(req.body)
+        .then(createdBook => {
+            res.status(200).json(createdBook)
+        })
+        .catch(err => {
+            res.status(400).json({
+                message: 'error'
+            })
+        })
+})
+// EXPORT
+module.exports = books
